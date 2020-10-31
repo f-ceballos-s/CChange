@@ -1,0 +1,125 @@
+---
+title: "Appendix"
+output:
+  word_document:
+    reference_docx: template.docx
+bibliography: C:/Users/fc3/Box Sync/CChange2/Literature/CChange2.bib
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE)
+source("C:/Users/fc3/Box Sync/CChange2/R_Code/CChange2_Descr3.R")
+```
+
+# Apendix 1
+
+## Submodel 1. Water absorption
+
+@rodriguez2011coffee model water absorption through the roots, $S_w$, using a so-called Type III  response function as follows:
+
+$$S_w= D_w \Big[1-e^{\frac{-\alpha_w W)}{D_w}}\Big]$$,
+
+where $D_w$ is the demand for water, which also sets the upper bound for water uptake, $\Phi_w$, such that $0\leq Phi_w = S_w/D_w < 1$. $W(t)$ is the water available to the roots at time t (i.e. $W(t) = W_{soil}(t) - W_{PWP}(t)$) where $W_{PWP}(t)$ is the permanent wilting point, $W_{soil}(t)$ is the current level of water available in the soil, and $\alpha_w$ is the fraction of the root zone that can be searched by the roots calculated as a function of the whole plant Leaf Area Index, $LAI(t)$ and the light extinction coefficient $k$: 
+
+
+$$\alpha_w= 1-e^{-kLAI(t)}$$
+
+An example of how the area explored by the roots is calculated using real values is as follows: for a full-grown plant, the light extinction coefficient k is 0.446 and $LAI$ oscillates between 7 and 8 meters per meter of land. Therefore, the average fraction of the root zone explored by a full-grown plant is 0.967 or 96.7% of the volume occupied by the roots. The relationship between demand for water and available water can be derived using the implicit function theorem:
+
+$$\frac{\partial D_w}{\partial W} = - \frac{{\alpha_w}e^{-\frac{{\alpha_w}W}{D_w}}}{1-e^{-\frac{{\alpha_w}W}{D_w}}-{\alpha_w}e^{-\frac{{\alpha_w}W}{D_w}}W}.$$
+
+The numerator is always positive. The denominator has only one plausible case given that W is a non-negative value. If $W > 0$ the  denominator is always positive, and therefore $\frac{\partial D_w}{\partial W}$  is negative, which means that demand for water decreases as water availability increases. It indicates satiation by the plant. The case of $W = 0$ is ruled out since at this point the denominator of the exponentials is 0 and therefore the partial derivative evaluated at this value of $W$ is undefined. This process concurs with agronomic theory in that if the soil is at permanent wilting point, there is no recovery for the plant and death is inevitable.
+
+## Submodel 2. Production of photosynthate
+
+The modeling of production of photosynthate follows a similar Type III response function written as follows:
+
+$$S=D\Big[1-e^{\frac{-\alpha_w W-\alpha(LAI)*c*I}{D}}\Big]$$
+
+$S$ is the per capita photosynthetic rate, demand $D$ is the genetical maximum per plant under conditions of non-limiting resource, $\alpha LAI(t)$ is identical to , $I_o$ is the photosynthetically active radiation hitting the canopy of the plantation, and the constant $c$ is the rate of conversion from Io to photosynthate, all of which are assumed to be positive. If the non-limiting resource condition holds for all inputs but demand for water $D_w$, then:
+
+$$\frac{\partial S}{\partial D_w} = 1-e^{-\frac{\alpha (LAI) \cdot c \cdot I_o}{D_w}}-\frac{\alpha\left(LAI\right)e^{-\frac{\alpha\left(LAI\right)\cdot c\cdot I_o}{D}}\cdot c\cdot I_o}{D_w}$$ 
+
+which is always positive for $D_w >0$. However, demand of water has to be compounded with the demand for oxygen, as water and oxygen compete for space within the porosities of the soil. When precipitation exceeds surface runoff, evapotranspiration, and infiltration, waterlogging can have detrimental efects on production of photosynthate. In particular, under oxygen deficiency, plants recur to anaerobic fermentative processes in detriment of aerobic metabolism, with a significant loss in the efficiency of ATP generation [@sousa2002metabolic;@silveira2014growth], and therefore diminishing the photosynthate available for growing and building of reserves.
+
+## Submodel 3. Growth and reserves
+
+Plants produce photosynthate $S$ and allocate it in priority order to egestion $(1 - \beta)$, to respiration $(i.e. Q_10)$, or with conversion efficiency $\lambda$ to reproductive and vegetative growth and reserves $(GR)$:
+
+$$GR = (S \beta - Q_{10})\lambda$$
+
+It is very straightforward to see that $\frac{\partial GR}{\partial S}$   is non-negative given that $0 < \beta < 1$. In other words, the more photosynthate produced the larger the reproductive and vegetative growth reserves are.
+
+# Submodel 4. CBB development rate
+
+@rodriguez2013coffee model development rate of CBB, $R(T(t))$, as:
+
+$$R(T(t)) = \lambda - e^{\rho T(t)} - e^{\rho T_{max} -\frac{T_{max}-T(t)}{T_u}}$$
+
+The effect of temperature $T$ on the development rate can be estimated by the partial derivative: 
+    
+$$\frac{\partial R(T(t))}{\partial T(t)} = \rho e^{\rho T(t)}-e^{\rho T_{max} -\frac{T_{max}-T(t)}{T_u}} \cdot T_u^{-1}$$
+
+
+which is always positive for $\infty < T (t) < Tm$. Given that development rates are non-negative for living organisms, the previous functional form implies that the development rate can be modeled through a piecewise function:
+
+$$R(T(t))= 
+\begin{cases} 
+      0 & T(t)\leq T_{min} \\
+      \lambda - e^{\rho T(t)} - e^{\rho T_m -\frac{T_m-T(t)}{T_u}} & T_{min}\leq T(t)\leq T_{max} \\
+      0 & T_{max}\leq T(t) 
+   \end{cases}$$  
+
+The values for $\lambda$, $rho$, $T_m$ and $T_u$ have been estimated by @jaramillo2000distribucion and validated for the Colombian case in both experimental and productive settings. Their research finds: $\lambda = -1.0551$, $\rho = 0.00358$, $T_m = 34.2548°C$ and $T_u = 0.1537°C$ which in turn sets the minimum temperature, $T_{min}$, for positive development rates of CBB at 14.9°C.
+
+# Submodel 5. Dynamics of production
+
+The general model for the i-th class of an age structured population proposed by @gutierrez1998tritrophic can be used to describe the process of production in coffee. The model links density of a cohort $N_i$ (in mass or numbers i.e. yields in kg./ha.), to the number of age classes $k$, the expected mean development time $\Delta$, the increment in age during one day $\Delta x(T (t))$ in degree days and the proportional net loss rate that includes biological factors such as herbivory (or CBB parasitation) $\mu_i$ so that:
+
+$$\frac{dN_i(t)}{dt} = \frac{k \Delta x(T(t))}{\Delta}[N_{i-t} - N_i] - \mu_i N_i$$
+
+Two previous submodels enter in action in submodel 5: the reproductive and growth reserves GR which are positively correlated with $N_i$ and $N_{i-1}$ , and the CBB development rate which is positively correlated with the cohort density variables. This result stems from the fact that the shorter the reproductive period, the larger the population of egg-laying females and the more severe the net loss from CBB infestation.
+
+Similarly, temperature has two opposing effects on yields: a positive direct effect through $\Delta x(T (t))$ and a negative indirect effect through $\mu_i$. The relative strength of the effects has important implications on the functional form that captures the effect of temperature on yields and the expected signs of the coefficients associated with it. Some intuition for this question can be gauged from @rodriguez2013coffee: the number of newly attacked coffee berries at time $t$, $S_b(t)$ is a function of the number of searching CBB females $N_b(t)$, the demand for berries $B(t)$ and the female search rate $\alpha_b$, such that:
+
+$$S_b(t) = {B(t)}\left[1 -  e^{\left(\frac{-N_b(t)(1 - e^{(-\alpha_b(t)B(t)/N_b(t))}) }{B(t)}\right)} \right]$$
+
+If the search is imperfect: $0 \leq \Phi = S_b(t)/B(t) < 1$, it means that some females ($1- \Phi$) fail to find a host or are lost to the local population due to emigration. We argue that the failure of CBB to completely infest all new coffee berries implies that temperature still has an overall positive effect on yield realization even if it is dampened by the increased parasitization due to larger and more frequent cohorts of CBB.
+
+# Appendix 2
+
+##  Projected changes in coffee productivity for selected municipalities, 2041-2060
+
+```{r projection max,echo=F, message=F, warning=F}
+round_df <- function(x, digits) {
+  # round all numeric variables
+  # x: data frame 
+  # digits: number of digits to round
+  numeric_columns <- sapply(x, mode) == 'numeric'
+  x[numeric_columns] <-  round(x[numeric_columns], digits)
+  x
+}
+nm.mp = poly@data[,c("DPTOMPIO","NOMB_MPIO")]
+nm.mp$DPTOMPIO = as.numeric(nm.mp$DPTOMPIO)
+v = left_join(nm.mp,as.data.frame(v),by = c("DPTOMPIO" = "mpio"))
+v = v[!duplicated(v), -1]
+v = v[rowSums(is.na(v[,3:10])) != ncol(v[,3:10]), ]
+v[,3:10] = round_df(v[,3:10],3)
+colnames(v) = c("Municipality","Altitude dummy",files)
+kable(v)
+
+```
+
+
+# Appendix 3
+
+## Expected changes in coffee productivity for all municipalities
+
+```{r errorbar proj all,echo=F, message=F, warning=F}
+# Change exec in source to TRUE
+bar_gph
+```
+
+
+

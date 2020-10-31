@@ -1,0 +1,57 @@
+	(1)	(2)
+VARIABLES	LSDV	LSDV
+		
+tmean_mar	0.162**	0.0859
+	(0.0672)	(0.0732)
+tmean_mar2	-0.00447***	-0.00368**
+	(0.00156)	(0.00154)
+tmean_aug	-0.372***	0.0561
+	(0.117)	(0.129)
+tmean_aug2	0.00611**	0.00186
+	(0.00285)	(0.00286)
+prec_mar	0.000710	0.000214
+	(0.000974)	(0.000970)
+prec_mar2	3.60e-06***	6.39e-07
+	(1.25e-06)	(1.29e-06)
+prec_aug	-2.12e-05	-4.75e-05
+	(0.00100)	(0.000995)
+prec_aug2	-5.65e-06***	-2.84e-06***
+	(8.16e-07)	(9.04e-07)
+o.tmean_mar	-	-
+		
+o.prec_mar	-	-
+		
+c.tmean_mar#c.prec_mar	-9.89e-05**	-4.01e-05
+	(4.48e-05)	(4.45e-05)
+o.tmean_aug	-	-
+		
+o.prec_aug	-	-
+		
+c.tmean_aug#c.prec_aug	0.000125***	7.25e-05
+	(4.81e-05)	(4.79e-05)
+year		0.0479
+		(0.0379)
+y1		0.522**
+		(0.214)
+y2		0.534***
+		(0.164)
+y3		0.194*
+		(0.113)
+y4		0.357***
+		(0.130)
+y5		0.0637
+		(0.0490)
+o.y6		-
+		
+o.y7		-
+		
+Constant	4.094***	-97.86
+	(1.139)	(76.23)
+		
+Observations	3,646	3,646
+R-squared	0.056	0.091
+Number of id	521	521
+Municipality FE	YES	YES
+Year FE	NO	YES
+Standard errors in parentheses		
+*** p<0.01, ** p<0.05, * p<0.1		

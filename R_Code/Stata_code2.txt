@@ -1,0 +1,54 @@
+cd "C:\Users\fc3\Box Sync\CChange2\STATA_tables"
+
+** Global model GMM
+
+* Difference GMM 
+
+import delimited "C:\Users\fc3\Box Sync\CChange2\df.csv"
+
+gen tmean_mar2 = tmean_mar^2
+gen tmean_aug2 = tmean_aug^2
+gen prec_mar2 = prec_mar^2
+gen prec_aug2 = prec_aug^2
+gen v_cafe= p_cafe/as_cafe
+replace v_cafe = 0 if (v_cafe >= .)
+
+xtset id year
+
+tab year, gen(y)
+
+xtreg v_cafe tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2, fe
+outreg2 using dynamic2.doc, replace ct(LSDV) 
+xtdpdgmm v_cafe L.v_cafe tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2,gmm(L.v_cafe, lag(1 6) m(d))  iv(tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2, m(d)) vce(robust)
+outreg2 using dynamic2.doc, append ct(Difference GMM) 
+xtdpdgmm v_cafe L.v_cafe tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2  alt_mn,gmm(L.v_cafe, lag(1 6) m(l))  iv(tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2, m(d)) iv(alt_mn, m(l)) vce(robust)
+outreg2 using dynamic2.doc, append ct(System GMM) 
+xtdpdgmm v_cafe L.v_cafe tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2 c.tmean_mar#c.prec_mar c.tmean_aug#c.prec_aug alt_mn, gmm(L.v_cafe, lag(1 6) m(l))  iv(tmean_mar tmean_mar2 tmean_aug tmean_aug2 prec_mar prec_mar2 prec_aug prec_aug2 c.tmean_mar#c.prec_mar c.tmean_aug#c.prec_aug, m(d)) iv(alt_mn, m(l)) vce(robust)
+outreg2 using dynamic2.doc, append ct(System GMM2) 
+
+gen y_hat = _b[L.v_cafe]*L.v_cafe + _b[tmean_mar]*tmean_mar + _b[tmean_mar2]*tmean_mar2 + _b[tmean_aug]*tmean_aug + _b[tmean_aug2]*tmean_aug2 + _b[prec_mar]*prec_mar + _b[prec_mar2]*prec_mar2 + _b[prec_aug]*prec_aug + _b[prec_aug2]*prec_aug2 + _b[_cons] if !e(sample)
+gen y_hat = _b[L.v_cafe]*L.v_cafe + _b[tmean_mar]*tmean_mar + _b[tmean_mar2]*tmean_mar2 + _b[tmean_aug]*tmean_aug + _b[tmean_aug2]*tmean_aug2 + _b[prec_mar]*prec_mar + _b[prec_mar2]*prec_mar2 + _b[prec_aug]*prec_aug + _b[prec_aug2]*prec_aug2 + _b[alt_mn]*alt_mn + _b[_cons] if !e(sample)
+gen y_hat = _b[L.v_cafe]*L.v_cafe + _b[tmean_mar]*tmean_mar + _b[tmean_mar2]*tmean_mar2 + _b[tmean_aug]*tmean_aug + _b[tmean_aug2]*tmean_aug2 + _b[prec_mar]*prec_mar + _b[prec_mar2]*prec_mar2 + _b[prec_aug]*prec_aug + _b[prec_aug2]*prec_aug2 + _b[c.tmean_mar#c.prec_mar]*c.tmean_mar#c.prec_mar + _b[c.tmean_aug#c.prec_aug]*c.tmean_aug#c.prec_aug + _b[alt_mn]*alt_mn + _b[_cons] if !e(sample)
+
+drop y_hat
+drop res_hat
+gen y_hat = _b[L.v_cafe]*L.v_cafe + _b[tmean_mar]*tmean_mar + _b[tmean_mar2]*tmean_mar2 + _b[tmean_aug]*tmean_aug + _b[tmean_aug2]*tmean_aug2 + _b[prec_mar]*prec_mar + _b[prec_mar2]*prec_mar2 + _b[prec_aug]*prec_aug + _b[prec_aug2]*prec_aug2 + _b[c.tmean_mar#c.prec_mar]*c.tmean_mar#c.prec_mar + _b[c.tmean_aug#c.prec_aug]*c.tmean_aug#c.prec_aug + _b[alt_mn]*alt_mn + _b[_cons] if !e(sample)
+g res_hat = (v_cafe-y_hat)^2
+sum res_hat
+
+** Long run coefficients
+
+nlcom _b[_cons]/(1-_b[L.v_cafe ])
+nlcom _b[tmean_mar]/(1-_b[L.v_cafe ])
+nlcom _b[tmean_mar2]/(1-_b[L.v_cafe ])
+nlcom _b[tmean_aug]/(1-_b[L.v_cafe ])
+nlcom _b[tmean_aug2]/(1-_b[L.v_cafe ])
+nlcom _b[prec_mar]/(1-_b[L.v_cafe ])
+nlcom _b[prec_mar2]/(1-_b[L.v_cafe])
+nlcom _b[prec_aug]/(1-_b[L.v_cafe ])
+nlcom _b[prec_aug2]/(1-_b[L.v_cafe])
+nlcom _b[c.tmean_mar#c.prec_mar]/(1-_b[L.v_cafe ])
+nlcom _b[c.tmean_aug#c.prec_aug]/(1-_b[L.v_cafe])
+nlcom _b[alt_mn]/(1-_b[L.v_cafe ])
+
+gen y_hat = .89*tmean_mar - 0.018*tmean_mar2 + 0.214*tmean_aug - 0.018*tmean_aug2 + 0.01*prec_mar + 0.00000896*prec_mar + 0.0056*prec_aug - 0.00000133*prec_aug2 - 0.00058*c.tmean_mar#c.prec_mar + 0.000327*c.tmean_aug#c.prec_aug - 0.00174*alt_mn - 4.144 if !e(sample)

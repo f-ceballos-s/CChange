@@ -1,0 +1,248 @@
+---
+title: 'The Effect of Climate Variability on Colombian Coffee productivity: A Dynamic Panel
+  Model Approach'
+output:
+  word_document:
+    reference_docx: template.docx
+bibliography: C:/Users/fc3/Box Sync/CChange2/Literature/CChange2.bib
+csl: agricultural-systems.csl
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(readxl)
+library(grid)
+library(Gmisc)
+opts_chunk$set(echo = TRUE)
+source("C:/Users/fc3/Box Sync/CChange (fc3@illinois.edu)/R_Code/CChange2_Descr.R")
+```
+
+# 1. Introduction
+
+Coffee is one of the major crops produced in Colombia. This country is the world's third largest producer of coffee after Brazil and Vietnam. Currently, up to 550,000 families depend directly on coffee production for their livelihoods [@FederacionNacionaldeCafeterosdeColombia2017]. Many more depend on it indirectly.  Due to changing climate conditions, there has been increasing concern about the future quantity and quality of the coffee yield in the decades to come. Following a surge of crop production functions that propose to forecast the yield of crops such as corn [@burke2016adaptation], soybeans [@fodor2017integrating] and rice [@shrestha2016adaptation], some studies have also offered their forecast on coffee [@gay2006potential; @schroth2009understanding; @sachs2015empirics]. They conclude that coffee is one of the crops that will suffer the most under unpredictable weather, with estimates of productivity losses of up to 34% for Mexico and 20% for Brazil. When it comes to Colombia, they forecast an increase between 4 and 24% in productivity. However, these studies restrict themselves to estimates at the national level. With more than 500 municipalities producing coffee in Colombia, one cannot assume that each of them will be affected in the same way. As a result, this paper builds on the existing literature and offers the first estimates and forecasts of the impact of climate variability at the municipal level.
+
+Crop production estimation efforts that rely on cross-sectional data, such as the ones conducted by @gay2006potential and @schroth2009understanding, explicitly estimate the effect of varying weather conditions on coffee productivity. However, they face a number of challenges: first, the availability of data on labor and capital inputs is often limited, and model selection is therefore constrained by the variables present in the data set. Ensuing models are highly discretionary in their choice of variables and functional form and could suffer from omitted variable bias if relevant variables are not explicitly modeled. Furthermore, the reliance on particular sets of data available at the regional level limits their external validity as the variables used in each particular model are not always present in other contexts and other datasets.
+
+One alternative for modeling coffee distribution that implicitly addresses these issues is the use of Maximum Entropy (MaxEnt) algorithms. These models rely on presence-only data to predict distribution of crops, under the assumption that the absence of records from an area provides a meaningful signal on the suitability of unobserved conditions for the cultivation of the crop (for an in-depth explanation of MaxEnt algorithms, see @elith2011statistical). Furthermore, by only considering the relation between the exogenous weather conditions and productivity, this model offers a high flexibility for estimation in various settings. For instance, MaxEnt models on coffee have been estimated at the global scale by @bunn2015bitter and @magrach2015climate, leading them to conclude that the largest losses will happen in areas located at elevations below 1000 meters above sea level (henceforth, m.a.s.l), and particularly in the coffee-growing regions of Brazil and Southeast Asia. At the regional scale, similar models have been estimated in the case of Nicaragua [@laderach2017climate] where suitability for coffee cultivation is expected to decrease in 90% of the current growing areas, with decreases of at least 25% in areas located between 500 and 800 m.a.s.l. A potential shortcoming of MaxEnt models is that, contrary to econometric estimation of crop production functions, they do not explicitly model changes in productivity. Additionally, the accuracy of the predictions on the probability of presence is highly dependent on the quality of the presence-only data [@elith2011statistical].
+
+The strengths and shortcomings of both approaches imply trade-offs that are not easy to optimize. For instance, modeling for unobservable conditions strengthens predictions on highly heterogeneous settings, but the interpretability of the model is diminished. Similarly, explicit estimation of the effect of weather conditions on productivity is highly desirable, but it comes at the cost of discretionary model selection, which can lead to misspecification. A step towards bridging this gap is proposed by @sachs2015empirics. By using panel data methods, both time-variant and time-invariant unobserved characteristics can be implicitly modeled through the use of fixed effects models, hence improving the accuracy of estimations of marginal effects [@wooldridge2002econometric]. Furthermore, parting from the basic model with only weather conditions as regressors, these models can be enriched to suit the availability of data. In their paper, the authors estimate a highly heterogeneous future with decreases of yield of up to 70% in countries like Guatemala and Kenya, and increases of up to 60% in countries such as Nigeria and Gabon.
+
+This paper posits a further refinement of the panel data estimation of the effects of climate variability on coffee productivity in Colombia. Its first contribution is the estimation of the panel model at the municipal level using yield and planted area data published by the Ministry of Agriculture of Colombia for the years 2007 to 2013. We believe this is a crucial endeavor as nationwide estimates might be misleading for policy-making decisions at the local level. In particular, the forecasts by @sachs2015empirics point to an increase in productivity of at least 4% for Colombia. However, the works of @bunn2015bitter, @magrach2015climate, and @laderach2017climate suggest that a uniform increase in productivity is unlikely, with some municipalities experiencing a boost in productivity while others should undergo a contraction. By offering estimates at the local level, we hope to guide policy-making decisions that fit the conditions of the municipalities.
+
+Another contribution of this paper addresses the issue of model selection. Econometric analysis is susceptible to misspecification if the variables and functional form are not properly selected given the available data. Even though previous work in this topic has drawn from agronomic literature to guide the model selection process, we believe that greater efforts should be made to harmonize the understanding of biological processes related to crop production and the estimation of the effect of climate variability via econometric analysis. One notable exception is the work by @rahn2018exploring; however, our work relies on secondary data, as opposed to experimental data. We dedicate a subsection to the design and interpretation of a simplified agronomic model, from which we derive expectations of the functional form and direction of marginal effects. By construction, these models are a crass representation of biological processes; however, we believe that they provide us with better tools to guide, interpret, and verify the output of our models.
+
+This paper is outlined as follows. Section 2 presents the materials and methods. A subsection is devoted to adapting a coffee physiology model to the Colombian case in order to derive testable hypotheses for the econometric analysis. The second subsection builds the econometric model around these testable hypotheses, drawing from the previous literature on coffee physiology models and coffee production functions. Finally, a subsection is devoted to the description of the data. Section 3 presents and discusses the results, including forecasts, and section 4 summarizes our main findings and offers some concluding remarks.
+
+
+# 2. Data and methods
+
+## 2.1 Data
+
+Our data set comprises 521 coffee-producing municipalities that continuously registered at least one hectare of arabica coffee (*Coffea arabica*) from 2007 to 2013. By 2017, three quarters of the coffee planted in Colombia were coffee leaf rust resistant varieties [@FederacionNacionaldeCafeterosdeColombia2017]. Some municipalities registered planted hectares but no production, which means these hectares are likely newly planted and have not started producing. Municipalities that had records of coffee cultivation for a subset of the years studied were excluded. The yield data as well as planted area were obtained from the Municipal Panel, a longitudinal data set compiled by the University of Los Andes in Bogota based on multiple sources including the Ministry of Agriculture, the Agricultural Bank, and the National Bureau for Statistics (DANE) [@acevedo2014panel].
+
+Developing countries such as Colombia have a very limited network of weather stations. For instance, the National Center for Coffee Research in Colombia manages a network of 56 weather stations in 36 distinct municipalities that comprise only 6% of Colombia's coffee production areas. The limited extent of the network leaves us with three options: i) rely on a small sample, ii) interpolate the missing observations through spatial krigging [@chun2013spatial;@calderon2009spatial;@park2019using], or iii) use calculated temperature data. Since solutions i and ii would lead to severely biased and/or inconsistent estimates, we focus our efforts on the third option. It can be dealt with either remotely sensed data or through data from a regional and global climate model. 
+
+Remotely sensed data offers great flexibility and availability, as it is continuously generated at various spatial and temporal resolutions. Improvements in quality have also led to its increased use in economic analysis [@donaldson2016view]. Satellite imagery is often available at resolutions of 0.25° to 1° [@karger2017climatologies], with some images at the 0.05° resolution [@peresvalidation]. Building on remotely sensed data, a number of global climate models have further refined it with the addition of weather modeling results and ground and radiosonde observations [@karger2017climatologies;@fick2017worldclim]. They offer a finer resolution than raw satellite imagery (up to 30 arc seconds or ~1 km at the Equator) with the potential downside of limited availability. For instance, WorldClim data  is only available from 1970 to 2000 and CHELSA Version 1.2 is available from 1979 to 2013. Given the time frame of this study, CHELSA V.1.2 is suitable for the analysis and is used for the estimations.
+
+Table 1 presents the descriptive statistics individually for high and low altitude municipalities (above and below the mean altitude of 1518 m.a.s.l.). Temperature is, on average, nearly 6°C lower in the first compared to the second group. Our results, displayed in the next section, will indicate that the altitude plays a significant role on coffee productivity. The choice of August and March as the months of observation of temperature and precipitation is explained in the next subsection.
+
+$$[insert descriptive table here]$$
+
+In this paper, we use state-of-the-art future climate projections that rely on Global Circulation Models (GCMs) driven by different greenhouse gas emission scenarios. The driving GCMs use the SRES A2 emission scenario for future greenhouse gas emissions as described in the IPCC 4th Assessment Report [@ipcc2007physical]. The A2 scenario describes a world with a continuously increasing population, an emphasis on economic growth and regionally oriented economic development (heterogeneous world) [@nakicenvoic2000ipcc]. The projected CO2 concentrations based on this scenario are about 509 and 870 ppm by the middle and end of the 21st century respectively, which corresponds to a global temperature rise of around 3.5°C between 2000 and 2100. The local values for 2041 to 2060 are obtained from eight GCMs [@haarsma2016high; @o2016scenario]: BCC-CSM2-MR, CNRM-CM6-1, CNRM-ESM2-1, CanESM5, IPSL-CM6A-LR, MIROC-ES2L, MIROC6, and MRI-ESM2-0^[BCC-CSM2-MR stands for The Beijing Climate Center Climate System Model, CNRM-CM6-1 and CNRM-ESM2-1 stand for the Centre National de Recherches Météorologiques Circulation Model 1 and Earth Sytem Model 1 respectively, CanESM5 stands for The Canadian Earth System Model version 5, IPSL-CM6A-LR stands for Institut Pierre-Simon Laplace Circulation Model 6A, MIROC-ES2 and MIROC6 stand for Model for Interdisciplinary Research on Climate, Earth System Earth Sytema and Circulation Model respectively, and MRI-ESM2-0 stands for The Meteorological Research Institute Earth System], for the 2-45 Shared Socio-Economic Pathway (SSP) at the 2.5-minute resolution. On average, temperature and precipitation are expected to increase in Colombia's coffee-growing region; the increase in precipitation in August is especially noteworthy, as it traditionally corresponds to a dry period.
+
+A La Niña phenomenon was experienced at varying intensities between 2008 and 2011, increasing the prevalence of coffee leaf rust in Colombia and Central America [@avelino2015coffee]. This event, aggravated by diminished flowering, resulted in a depression of coffee production and exports from Colombia [@bastianin2018economic]. Figure 1 presents the time trends of temperature, precipitation, and yield for the years 2007 to 2013:
+
+```{r figure 1, fig.width= 16, fig.height= 12, fig.cap="Figure 1. Time trends of coffee productivity with respect to (A) March temperature, (B) August temperature, (C) March precipitation, and (D) August precipitation in Colombia, 2007 to 2013" ,echo=F, message=F, warning=F}
+ggline
+```
+
+The graph shows a spike in precipitation, beginning in March 2008 and carrying on until March 2009. It was accompanied by a dip in total output of coffee in 2009, with a brief recovery in 2010 when precipitation decreased and mean temperature in March was high. This provides further evidence of the sensitivity of coffee productivity to varying weather conditions.
+
+## 2.2 Theoretical framework
+
+Changes in weather can have direct and indirect effects on coffee productivity. The direct effects refer to changes that modify the physiological processes of the plant and have an impact on the productivity realizations, which include induction of flowering and pollination as a result of short periods of hydric stress [@ramirez2014floracion] or induction of vegetative growth as a result of extended rainy seasons [@carr2001water]. The indirect effects of changes in weather refer to changes in incidence of diseases, which include the Coffee Leaf Rust (*Hemileia vastatrix*) [@bastianin2018economic], and the distribution and reproduction patterns of both pests and pollinators, which include changes in the reproductive cycle of the Coffee Berry Borer (*Hypothenemus hampei*, Henceforth CBB) [@magina2007temporal;@jaramillo2010temperature;@atallah2018bioeconomic;@iscaro2014impact] and diminishing bee populations [@imbach2017coupling].
+
+We follow the example of @van2010coffee in considering that the complexity of models should be adjusted to the availability of data. We propose a simplified model for coffee production where the observable inputs of water and temperature have direct and indirect effects on five biological submodels. Figure 1 presents the graphical representation of the model:
+
+```{r figure 2, fig.width=16,fig.height=10,fig.cap="Figure 2. Proposed model for coffee productivity: relationship between coffee productivity, temperature, and precipitation", out.width = '100%',echo=F, message=F, warning=F}
+grid.newpage()
+leftx <- .25
+midx <- 0.5
+rightx <- .75
+topy <- .75
+midy <- .5
+bottomy <- .25
+wd <- .1
+hg = .1
+gp <- gpar(fill = "gray97")
+gp2 = gpar(col=NA)
+gp3 <- gpar(fill = NA)
+
+grid.rect(x=unit(.5, "npc"),y=unit(.5, "npc"),width=unit(.69, "npc"),height=unit(.69, "npc"),
+          gp=gpar(col="Black",lwd=4))
+
+(gg1.0 <- boxGrob("",
+                  x=leftx-0.2, y=topy, box_gp = gp2, width = unit(wd, "npc"), height = hg))
+
+(gg1.1 <- grid.text("Water",
+                    x=leftx-0.15, y=topy+0.03))
+
+(gg1 <- boxGrob("Submodel 1:\n Water\n absorption",
+                x=leftx, y=topy, box_gp = gp, width = unit(wd, "npc"), height = hg))
+connectGrob(gg1.0, gg1, "h")
+
+(gg2.0 <- boxGrob("",
+                  x=midx, y=topy+.2, box_gp = gp2, width = unit(wd, "npc"), height = hg))
+
+(gg2.1 <- grid.text("Solar radiation",
+                    x=midx, y=topy+0.21))
+(gg2.1 <- grid.text("Leaf Area\n Index",
+                    x=midx+0.03, y=topy+0.075))
+
+(gg2 <- boxGrob("Submodel 2:\n Production of \nphotosynthate",
+                 x=midx, y=topy, box_gp = gp, width = unit(wd, "npc"), height = hg))
+connectGrob(gg1, gg2, "h")
+connectGrob(gg2.0, gg2, "v")
+
+(gg3 <- boxGrob("Submodel 3:\n Growth and\n reserves",
+                  x=midx, y=midy, box_gp = gp, width = unit(wd, "npc"), height = hg))
+connectGrob(gg2, gg3, "v")
+
+(gg4 <- boxGrob("Submodel 4:\n CBB and CLR development \nrate",
+                   x=rightx, y=midy, box_gp = gp, width = unit(wd, "npc"), height = hg))
+
+(gg5 <- boxGrob("Submodel 5:\n Dynamics of\n production",
+                x=(midx+rightx)/2, y=bottomy, box_gp = gp, width = unit(wd, "npc"), height = hg))
+connectGrob(gg3, gg5, "Z")
+connectGrob(gg4,gg5,"Z")
+
+
+(gg.0 <- boxGrob("",
+                 x=(midx+rightx)/2, y=topy+0.2, box_gp = gp2, width = unit(wd, "npc"), height = hg))
+
+(gg.1 <- grid.text("Temperature",
+                  x=(midx+rightx)/2, y=topy+0.21))
+l1 = connectGrob(gg.0, gg3, "N")
+l1[["y"]][[2]] = unit((topy+midy)/2,"npc")
+l1[["y"]][[3]] = unit((topy+midy)/2,"npc")
+l1
+l2 = connectGrob(gg.0, gg4, "N")
+l2[["y"]][[2]] = unit((topy+midy)/2,"npc")
+l2[["y"]][[3]] = unit((topy+midy)/2,"npc")
+l2
+connectGrob(gg.0, gg5, "N")
+
+(gg5.1 <- boxGrob("",
+                  x=(midx+rightx)/2, y=bottomy-0.175, box_gp = gp2, width = unit(wd, "npc"), height = hg))
+(gg5.0 <- grid.text("Productivity",
+                    x=(midx+rightx)/2, y=bottomy-0.15))
+connectGrob(gg5, gg5.1, "N")
+
+(legend <- grid.text(expression(bold("Legend")), x = .2, y = .35))
+(leg.grob <- boxGrob("",
+                  x=.18, y=.32, box_gp = gp, width = .01, height = .01))
+(grob.txt <- grid.text("Biological submodel", x = .25, y = .32))
+grid.lines(x = unit(c(.175, .185), "npc"),
+          y = unit(c(0.29, 0.29), "npc"),
+        gp = gpar(fill="black"),
+          arrow = arrow(length = unit(0.01, "npc"), 
+            ends="last", type="closed"))
+(grob.txt2 <- grid.text("Biological path", x = .245, y = .29))
+(grob.txt3 <- grid.text("Aa     Exogenous input/endogenous factor", x = .26, y = .26))
+
+```
+
+The general model aims to demonstrate how one output, coffee yield per area planted, results from the dynamics of three exogenous inputs: water, photosynthetically active radiation (noted Io), and temperature, and one endogenous factor: Leaf Area Index (LAI). Five submodels have been developed by @rodriguez2011coffee and @rodriguez2013coffee to describe the physiological processes of water absorption, production of photosynthate, growth and reserves, CBB development rate, and dynamics of production. We take LAI and Io as constant due to our inability to observe them in our data. The first submodel, water availability and absorption, is almost exclusively dependent on precipitation as there is very little irrigated coffee cultivation. The water that is absorbed is broken apart in the photosynthetic process that transforms the carbon dioxide into photosynthate (submodel 2). The photosynthate that is produced and is the focus of the second submodel can be egested, respired, accumulated in reserves, or used in growth. Of the share of photosynthate accumulated in reserves or used in growth, a fraction of it is used for reproduction and is directly related to productivity realization (submodel 3).
+
+Temperature is present in three submodels. First, it has a direct effect on respiratory rates that occur at the expense of greater accumulation of reserves and growth as well as on the increment of age due to the accumulation of thermic units (submodel 3). Second, it has a direct effect on the increment of age of CBB due to accumulation of thermal units (model 4 in the annex), which in turn has an effect on the dynamics of production (model 5) as CBB is the leading cause of loss due to herbivory (parasitism). Additional details as well as the derivation of each model are presented in appendix 1. 
+
+Based on this model, we make inferences on three aspects of our econometric specification: i) $Y = f(T,T^2,P,P^2,T*P)$, ii) the observation of weather at March and August, and iii) the choice of a dynamic model specification to account for the effect of past productivity realizations on present productivity. The choice of quadratic forms of temperature and precipitation considers two facts: degree-days measurements are not feasible with the data we are working on, which has a monthly temporal resolution, and temperatures above the upper bound of coffee growth (35°C) are rare in Colombia's coffee-growing region. Therefore, we favor a simpler functional form that assumes quadratic forms of temperature and precipitation to account for potential non-linear relationships between temperature, precipitation, and productivity. 
+
+One of the main challenges of econometric modeling of production functions is the incongruence of the temporal scale of the variables studied @blanc2017use. Productivity data is usually available at yearly intervals, whereas weather data is observed at any given time resolution, from days to months. Furthermore, the inclusion of sequential observations of weather as regressors leads to an issue of multicollinearity, which can severely affect the efficiency of the estimators. We bridge this gap by building on the crop phenology literature: for any given crop, there exists a set of critical periods in which adverse environmental conditions can lead to a significant drop in productivity [@zhao2013plant]. Even though these periods do not preclude the importance of favorable weather conditions at other times during the production cycle, their predictive power over productivity realizations outweighs that of other periods. In the case of coffee, @damatta2006impacts and @damatta2007ecophysiology identify the flowering and bean formation period as critically susceptible to adverse weather conditions. High temperatures during blossoming, especially if associated with a prolonged dry spell, may cause abortion of flowers. Prolonged dry spells can also lead to fruit drop, notably in the endosperm formation phase of bean filling [@damatta2007ecophysiology]. For the case of Colombia, @ramirez2014floracion identify March and August as the periods of most intense flowering, with the largest coffee producing areas flowering in March. We adopt these two periods for the observation of temperature and precipitation, as flowers forming in March depend on weather conditions of that month (for blossoming) and on August conditions for bean filling, and vice versa.
+
+Finally, we choose to model the dynamic nature of productivity to account for the fact that coffee is a perennial crop [@damatta2007ecophysiology]. The effect of past productivity realizations can be either positive or negative. If higher profits are invested in improved fertilization and pest control practices, farmers can expect better yields in the coming years. However, productivity can be affected when those investments are not made. Photosynthate reserves are exhausted after a heavy crop load, as described in submodel 5. If they are not replenished, the number of fertilized flowers will be lower the next flowering season [@damatta2007ecophysiology]. This process is known as biennality of coffee productivity. We devote the next subsection to the description of the econometric model to adequately capture the inferences described in this section.
+
+## 2.3 Econometric model
+
+The reduced form model for our econometric estimation is presented in equation (1). The dynamic process of yearly productivity is captured by regressing current productivity realizations in tons/ha, $y_{it}$, on last year's productivity realization, $y_{it-1}$, and our chosen form of weather variables $X = (T,T^2,P,P^2,T*P)$. $c_i$ and $\mu_i$ are time-invariant and time-variant characteristics: 
+
+$$y_{it} = \theta y_{it-1} + X_{it} \beta + c_i + \mu_t + \varepsilon_{it} \; with \; \varepsilon_{it} \sim N(0,\sigma_\varepsilon^2)$$, (1)
+
+Estimation of this dynamic model using Least Squares Dummy Variable (LSDV) yields a downward biased estimation for $\theta$ [@nickell1981biases]. The reason is that the mean of the lagged dependent variable contains observations from time 0 to t-1 on y. The mean of the error captures the residuals from time 0 to t. Since $y_{it-1}$ depends on $\varepsilon_{it-1}$ and so does $\varepsilon_{it}$, the latter and $y_{it-1}$ are not orthogonal, hence $\theta$ is biased. We consider two alternatives to address this endogeneity. First, the Difference Generalized Method of Moments (GMM) proposed by @arellano1991some that estimates a model based on the first differences of equation (1). This transformation expunges the time-invariant fixed effects $c_i$ yet still suffers from endogeneity due to the dependence between $y_{it-1}$ and $\varepsilon_{it-1}$. It is addressed through the use of previous realizations of the dependent variable as instruments for the first lag, in our case the 2nd up to 6th lag of coffee productivity. Second, the System GMM proposed by @arellano1995another/@blundell1998initial, where the lagged dependent variable in equation (1) is instrumented using the first differences as instruments. This model requires the further assumption that the first difference instruments are uncorrelated with $c_i$.
+
+Four conditions are necessary for the correct identification of a dynamic panel model by GMM methods [@blundell2000estimation]: i)  the test of first order serial auto correlation must be significant; ii) the test of second order auto correlation must be non-significant; iii) the Hansen/Sargan test of over-identifying restrictions must be insignificant so that the null hypothesis of validity of the instruments is not rejected; iv) the coefficient of the lagged variable must fall within a credible range. The latter is determined by the coefficients of the same model using pooled ordinary least squares and least squares dummy variable estimation, with the former providing the upper bound and the latter the lower bound. We work with the STATA Statistical Package version 15.1. The static models are estimated using the xtreg command, whereas we employ the regress, xtreg, and xtdpdgmm [@kripfganz2019xtdpdgmm] commands to estimate the dynamic pooled, fixed effects and GMM models, respectively.
+
+# 3. Results and discussion
+
+## 3.1 Model fit
+
+
+Table 3 presents the results for the global model with lagged dependent variable^[We first estimated a static panel model that excludes the lagged dependent variable. It yields an optimal March temperature of 16.7°C, which is well below the optimal range estimated by @mosquera2005net, and @damatta2007ecophysiology. Therefore, we disregard those results and favor dynamic panel modeling. The results of the estimation are available from the authors upon request] corresponding to equation (1).
+
+$$[insert dynamic table here]$$
+
+Columns (1) and (2) present the pooling and fixed effects estimation results, providing the upper and lower bound for the coefficient of interest, $\theta$. The results in column (3) correspond to the @arellano1991some difference GMM estimation procedure for the entire sample. The tests for serial correlation reported at the bottom of table 3 show that there is serial correlation of order one (AR(1), p-value = 0.007), but there is no serial correlation of order two (AR(2), p-value = 0.237). These results imply that the lags of the dependent variable are a valid instrument for the endogenous first lag. As usual in the literature [@arellano1991some], the instruments that will be used for this variable are a combination of past lags; in our case, they correspond to the second up to the sixth lag.
+
+We expand on this model by fitting a system GMM [@arellano1995another; @blundell1998initial] with the inclusion of altitude as a regressor. The relevance of altitude in coffee production has been highlighted by the agronomic [@arcila2007sistemas] and environmental literatures [@bunn2015bitter; @magrach2015climate; @laderach2017climate]. The transition to system GMM allows the inclusion of time-invariant regressors yet requires the additional assumption that $y_{it-1}$ is not correlated with $c_i$. This assumption is difficult to test; however, we believe that it is backed by the fact that the coefficients have the same direction and similar magnitude as those in column (3). In addition, the results of column 4 fulfill the requirements for correct identification as stated by @blundell2000estimation. The negative and significant coefficient of altitude captures the slower rate of accumulation of thermal units due to cooler temperatures at higher altitudes, which result in lower accumulation of photosynthate [@arcila2007sistemas]. 
+
+The claims made in the theoretical framework are validated through the results shown in column (4). More precisely, we find statistically significant evidence of diminishing returns to temperature in March, in line with our expectation that high temperatures are harmful for coffee during the flowering season, as stated by @damatta2007ecophysiology. The effect of precipitation in March is positive and statistically significant. In line with the expectations derived in submodel 2, coffee plants react favorably to increased water availability both during the flowering period. We further argue that the monotonic relationship between precipitation and coffee productivity observed in our model captures the fact that hydric excess and waterlogging is a rare occurrence in Colombia as coffee is planted in hilly areas, which results in significant surface runoff and  in  porous soils with adequate hydric conductivity [@poveda2002modelo]. Even though excess rainfall has been associated with decrease in productivity [@ramirez2010indices], it is usually through the lack of a dry spell during the quiescent growth phase (about 2 to 4 months before flowering), which stimulates flowering. This results in scattered harvests and low yields [@damatta2007ecophysiology]. One limitation of this study is that we do not observe temperature and precipitation during the quiescent growth phase.
+
+The results show no significant effect for temperature and precipitation in August. We believe this captures the fact that the main blooming season in Colombia's largest coffee-growing regions takes place during the first semester with a peak in March [@velez2000distribucion; @ramirez2014floracion]. Weather conditions in August have a smaller impact on productivity, as the largest share of the yearly harvest is already at bean-filling stage, where beans are much more resilient to adverse weather conditions than flowers [@damatta2006impacts].
+
+It is also interesting to note similar magnitude and opposing direction of the coefficients on the interaction between temperature and precipitation for each month. While high temperature and precipitation in March impact productivity negatively, the opposite is true for August. A possible explanation relates to the dynamics of CBB infestation. As described in submodel 5, the number of CCB cohorts increases as temperature and precipitation increase. The impact of CBB on coffee productivity is also time-sensitive. If infestation occurs within the first two months after pollination, more than 50% of the berries are aborted; if it happens after the third month, that value drops to 23.5% [@bustillo2006review]. We believe that our model is capturing the opposing directions of the effect of the joint effect of temperature and precipitation on coffee productivity; both the coffee plant and CBB develop optimally at temperature ranges of 20°C to 25°C and benefit from soil and air humidity [@bustillo2007manejo]. When these favorable conditions coincide with pollination and initial bean formation, the damaging effect of greater CBB infestation outweighs the positive impact on vegetative and reproductive development of the coffee plant. However, when those same optimal conditions happen at the latest stages of the reproduction process, CBB causes less losses and bean filling is positively impacted by favorable temperature and precipitation. Given that the largest coffee-producing areas in Colombia flower in March, we argue that these results correctly reflect this fact.
+
+We also find evidence of the importance of accounting for the dynamic nature of coffee production. The coefficient on the lagged dependent variable, $\theta$, is positive and significant in column (4). This result suggests that previous productivity realizations have a positive impact on current productivity. A possible explanation for this is that better yields result in higher profits, which are re-invested into the crops in the form of better fertilization and pest control, which in turn leads to better yields in the following years.
+
+The significant effect of altitude presented in column (4) poses the question of the heterogeneity of the effect of climate variability on productivity at different altitudes. We explore this by interacting temperature and precipitation with altitude in a linear model. The results of this specification, presented in column (5), show that there are heterogeneous effects of precipitation for different altitudes. In particular, for each extra unit of altitude, one extra millimeter of precipitation in August increases productivity by 850 grams more. If the increase is observed in precipitation in August, the result is the opposite: as altitude increases, one extra unit of precipitation is less favorable, diminishing productivity by 740 grams. 
+
+The coefficients presented in columns (3) to (5) of table 3 are interpreted as the short-run marginal effects of the matrix of independent variables on the dependent variable [@arellano1991some]. The estimation of long-run effects is made possible by dividing the short-run estimates of the significant coefficients by the convergence rate $(1 - \theta)$. The results are presented in table 4. All the coefficients remain significant and the directions meet our expectations. We will use the coefficient of our preferred specification in column (2) for forecasting in the next subsection.
+
+$$[insert longrun table here]$$
+
+Further evidence of the validity of this estimation strategy is found through an exercise of productivity maximization at varying March temperatures. The optimal March temperature under the dynamic panel model is 19.5°C, which is within the optimal range for coffee production estimated by @mosquera2005net and @damatta2007ecophysiology. Figure 3 plots the marginal effects of temperature and precipitation, and associated productivity based on estimates from our preferred specification presented in column (2) of table 4. We plot separate curves for each altitude subset, and evaluate the other covariates at their median value. 
+
+```{r figure 3, fig.width=16,fig.height=10,fig.cap="Figure 3. (A) Marginal effects of temperature on coffee productivity by altitude group. (B) Marginal effects of precipitation on coffee productivity by altitude group", out.width = '100%',echo=F, message=F, warning=F}
+ggmarg
+```
+
+The stars in both curves represent the expected productivity evaluated at median value of the corresponding weather variable for the period 2007 to 2013. It is interesting to note that, despite the fact that average productivity is lower at higher altitudes, the expectation of increase in temperature in the future would have opposite effects for each group. In particular, for an average increase of 1° to 2°C by 2050 estimated by the National Institute of Hydrology, Meteorology and Environmental Studies of Colombia (IDEAM) [@ballesteros2007informacion], high-altitude municipalities would increase their productivity, theoretically reaching the optimum level of temperature for maximizing productivity. On the other hand, low-altitude municipalities would decrease their median productivity as they experience mean temperatures that are further away from the optimum. Similarly, high-altitude municipalities would benefit from lower precipitation in March whereas for low-altitude municipalities an increase would be beneficial. A consequence of this is that the productivity gap between high and low-altitude municipalities will narrow, potentially reshaping Colombia's coffee-growing regions.
+
+## 3.2 Forecasting
+
+In the case of the dynamic  model proposed in equation (1), the first approximation to the predictor at future time $K = T + r$ is the expectation of $y_{i,K}$ conditional on the information set, $I_K(y_{i,K-1},X_{i,K},c_i,\varepsilon_{i,K})$ :
+
+$$y_{i,K} = E[y_{i,T+r}|I_K] = E[\theta y_{i,K-1} + \beta X_{i,K} + c_i + \varepsilon_{i,K}]$$, (2)
+
+$$y_{i,K} = \theta y_{i,K-1} + \beta X_{i,K} + c_i$$, (3)
+
+Because the expectation of future shocks of the idiosyncratic error term $\varepsilon_{i,K}$ is assumed zero, it is expunged through the conditional expectation, but both $y_{i,K-1}$ and the time invariant fixed effects $c_i$ remain. $y_{i,K-1}$ is incorporated through the $(1 - \theta)$ convergence transformation of the coefficients. $c_i$ is the group-specific average of all the residuals. It is important to note that when $T$ is small, this can lead to biased estimates.
+
+The predictions of future temperature and precipitation are extracted from eight GCM: BCC-CSM2-MR, CNRM-CM6-1, CNRM-ESM2-1, CanESM5, IPSL-CM6A-LR, MIROC-ES2L, MIROC6, and MRI-ESM2-0, in the 2-45 SSP at the 2.5-minute resolution for the years 2041 to 2060. Each GCM contains predictions on future monthly precipitation and maximum and minimum temperature. We further assume that monthly temperature is normally distributed [@klein1975maximum] in order to calculate future mean temperature as the average of minimum and maximum monthly temperature. We present the results in figure 4 showing the predicted average (dot) and the 95% confidence interval (whiskers). 
+
+```{r figure 4, fig.width=16,fig.height=10,fig.cap="Figure 4. Projected coffee productivity for selected municipalities, 2041 to 2060.", out.width = '100%',echo=F, message=F, warning=F}
+bar_gph
+```
+
+The black solid line is the mean of coffee productivity fsrom 2007 to 2013, about 716 kg of coffee per hectare. Averaging over the set of predictions for the eight GCMs, our results suggest that coffee productivity will increase by 24% (confidence interval: [11.5,38.5]) for the years 2041 to 2060, within the predicted change estimated by @sachs2015empirics. Predictions for five out of eight GCMs point to an increase in productivity ranging from a 48% increase for MRI-ESM2-0 to a 1.2% increase under MIROC-ES2L. Only two models predict productivity levels significantly different from the average productivity between 2007 and 2013: CanESM5 and CNRM-ESM2-1. For high-altitude municipalities, productivity is expected to increase by 67% (confidence interval: [53,81.3]) on average. The set of predictions is also less ambiguous: seven out of eight predictions point to an increase in productivity, with only CanESM5 predicting a 17% drop in productivity. For low-altitude municipalities, productivity is expected to decline by 5% (confidence interval: [-26,16.8]) on average. Five out of eight prediction sets point to a decrease in productivity, with only two sets pointing to an increase: MRI-ESM2-0 and MRI-ESM2-0 (for municipality-specific predictions, see appendix 3). 
+
+We consider the possibility that some GCM's future projections of weather fall outside of the range of the weather conditions we used to fit our predictive model, which could potentially bias our projections. To account for this, we replicate our predictions using only those combinations of temperature and precipitation that we observed in our sample. The results show a slightly larger productivity increase of 32% (95% confidence interval: [18.93,45.1]) and are inlcuded in appendix 2.
+
+These results show that Colombia's unique topography is a buffer that can mitigate most of the effects of climate variability on coffee Productivity. Indeed, our findings indicate that negative impacts expected by low-altitude municipalities can be offset by increased productivity in high-altitude municipalities. However, these results display a larger heterogeneity when calculated at the local level. As such, careful consideration and understanding of the large degree of heterogeneity present in the country due to the very different altitude levels is necessary. Any policy-making endeavors aiming to protect the livelihoods of Colombian coffee farmers will require place-tailored solutions. 
+
+```{r figure 5, fig.width=12,fig.height=12,fig.cap="Figure 5. Expected changes in productivity across municipalities for the years 2041 to 2061 with respect to mean productivity from 2007 to 2013", out.width = '100%',echo=F, message=F, warning=F}
+ggproj
+```
+
+Our set of predictions is subject to a number of limitations. First, our study comprises a small number of years, which limits our ability to observe weather and productivity combinations that could potentially mimic those in the future. This problem could be addressed by including observations after 2013; however, it is currently not possible as the University of Los Andes has not made them available. Second, our model is not sensitive to climate variability adaptations that farmers can undertake, which could mitigate the magnitude of our predictions. Those adaptations have been documented in the literature and include shading [@schroth2009understanding; @jaramillo2011some], crop diversification [@rahn2014climate], and eventually crop shifting [@kabubo2007economic]. We believe our model can be enriched with data on these adaptation strategies to provide better estimates. Finally, our model ignores the technological progress that could make coffee plants more resilient to future weather conditions. Even though the effort to develop a CBB-resistant variety has yet to be successful, some avenues of research suggest this might be possible in the future [@romero2015evaluacion]. Similar efforts have been conducted to develop drought-resilient coffee plants [@silva2018reciprocal]. Nevertheless, we still believe that our estimates provide meaningful insights to policy-makers on the negative consequences of not addressing the challenges posed by future climate uncertainty.
+
+# 4. Conclusions
+
+This paper uses a panel data approach and a novel data set to measure the effect of climate variability in the framework of a crop production function built on elements from the crop physiology literature [@rodriguez2011coffee; @rodriguez2013coffee]. This approach allows us to go further than previous key references on the analysis of coffee productivity realizations [@gay2006potential; @sachs2015empirics] as we include the biennial productivity of coffee and provide results at the municipal, instead of only national, level. Since most policy-making institutions in Colombia operate at the sub-national level, it is important to produce estimates and forecasts at the local level to adequately address challenges that arise from climate variability. Furthermore, this paper makes use of high-resolution global climate models to compensate for the lack of weather gauges across the country. This approach is increasingly popular when focusing on climate variability-related studies in developing countries where the network of field weather stations is limited and accurate surface weather data is scarce [@bunn2015bitter; @magrach2015climate; @laderach2017climate]. 
+
+These results show that Colombia's unique topography is a buffer that can mitigate most of the effects of climate variability on coffee productivity. Indeed, our findings indicate that negative impacts expected by low-altitude municipalities can be offset by increased productivity in high-altitude municipalities. However, these results display a larger heterogeneity when calculated at the local level. As such, careful consideration and understanding of the large degree of heterogeneity present in the country due to the very different altitude levels is necessary. Any policy-making endeavors aiming to protect the livelihoods of Colombian coffee farmers will require solutions that differ between high and low-altitude municipalities.
+
+Our forecasting efforts are subject to a set of limitations that are common to the crop production function literature [@gay2006potential].  These are: using a constant technology, future weather forecasts and linear climate adaptation strategies are assumptions traditionally found in the crop production function literature but they deserved to be challenged (See @huffman2018economic and @caetano2018geographical for recent efforts in this direction on the production function of corn and soybeans respectively). For instance, novel adaptation strategies could open up new land for coffee production that is, so far, identified as unsuitable in our estimation [@schroth2009understanding; @jaramillo2011some; @cavatte2012could]. In a similar way, improvements in technology such as drought resistant cultivars could also help keep some cropland productive [@romero2015evaluacion]. These elements are not included in our predictions. Further work in this topic should also aim at identifying the municipalities that do not have the institutional and financial capacity to mitigate the effects of climate variability in order to offer them affordable diversification opportunities.
+
+# References
+
